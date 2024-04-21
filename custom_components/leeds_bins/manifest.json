@@ -1,0 +1,14 @@
+{
+    "domain": "leeds_bins",
+    "name": "Leeds Bins",
+    "codeowners": ["@joemcc-90"],
+    "config_flow": true,
+    "dependencies": [],
+    "documentation": "https://www.home-assistant.io/integrations/leeds_bins",
+    "homekit": {},
+    "iot_class": "cloud_polling",
+    "requirements": [],
+    "ssdp": [],
+    "zeroconf": []
+  }
+  

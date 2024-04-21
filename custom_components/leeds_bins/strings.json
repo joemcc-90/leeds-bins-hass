@@ -1,0 +1,26 @@
+{
+    "config": {
+      "abort": {
+        "already_configured": "Device is already configured"
+      },
+      "error": {
+        "cannot_connect": "Failed to connect",
+        "invalid_auth": "Invalid authentication",
+        "unknown": "Unexpected error"
+      },
+      "step": {
+        "user": {
+          "data": {
+            "name": "Name for this configuration",
+            "house": "Enter house name or number",
+            "icon": "Choose an Icon",
+            "id": "Unique number to identify your sensor later on.",
+            "postcode": "Enter postcode"
+          },
+          "description": "Description goes here",
+          "title": "Leeds Bins"
+        }
+      }
+    }
+  }
+  
