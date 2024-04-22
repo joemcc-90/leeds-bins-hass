@@ -82,4 +82,5 @@ mode: single
 ## Troubleshooting
 
 * If the sensor state is "No collection" then this means there is no scheduled collection, please check the dataset - [Dataset](https://datamillnorth.org/dataset/ep6lz/household-waste-collections)
+* To hide a sensor go to - `Settings` > `Devices & Services` > `Integrations` > `Leeds Waste Collection` > `Entities` and open the sensor you wish to hide. Use the `Visible` option to hide the sensor
 * To enable debug logging go to - `Settings` > `Devices & Services` > `Integrations` > `Leeds Waste Collection` and select `Enable debug logging` 
