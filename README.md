@@ -27,6 +27,7 @@ Attribute | Description
 Colour | Colour of the bin (i.e. GREEN, BLACK, BROWN)
 Next collection | Date of the next collection
 Days | Number of days until the next collection
+Info URL | URL to Leeds City Council website with information on what can and can't go in the bin
 
 Dataset used provided by Data Mill North [Click here for more info](https://datamillnorth.org/dataset/ep6lz/household-waste-collections)
 
@@ -34,8 +35,8 @@ Dataset used provided by Data Mill North [Click here for more info](https://data
 
 This integration can be installed directly via HACS. To install:
 
-* [Add the repository](https://my.home-assistant.io/redirect/hacs_repository/?owner=joemcc-90&repository=leeds-bins-hass&category=integration) to your HACS installation
-* Click `Download`
+* [Add the repository](https://my.home-assistant.io/redirect/hacs_repository/?owner=joemcc-90&repository=leeds-bins-hass&category=integration) to your HACS installation (If the link doesn't work go to `HACS` > `Integrationss` > `Custom Repositories` and add `https://github.com/joemcc-90/leeds-bins-hass` with category `Integration`)
+* Click `Download` (bottom right)
 * Restart Home Assistant
 
 ## Configuration
