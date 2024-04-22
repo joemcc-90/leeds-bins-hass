@@ -137,7 +137,17 @@ class LeedsBinsDataSensor(CoordinatorEntity, SensorEntity):
 
     def apply_values(self):
         """Set sensor values."""
-        self._name = f"{self.config_name} {self._bin_type.lower()} bin"
+        if self._bin_type == 'GREEN':
+            bin_name = 'Recycling'
+        elif self._bin_type == 'BLACK':
+            bin_name = 'General Waste'
+        elif self._bin_type == 'BROWN':
+            bin_name == 'Garden Waste'
+        if self.config_name is '':
+            name = f" {bin_name} bin"
+        else:
+            name = f"{self.config_name} - {bin_name} bin"
+        self._name = name
         if self.coordinator.data[self._bin_type] is not None:
             self._next_collection = parser.parse(
                 self.coordinator.data[self._bin_type], dayfirst=True

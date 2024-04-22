@@ -3,7 +3,7 @@
   "name": "Leeds Waste Collection",
   "codeowners": ["@joemcc-90"],
   "config_flow": true,
-  "version": "20240422.01",
+  "version": "20240422.02",
   "dependencies": [],
   "documentation": "https://github.com/joemcc-90/leeds-bins-hass",
   "homekit": {},

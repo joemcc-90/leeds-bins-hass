@@ -26,7 +26,7 @@ CONF_POSTCODE = "postcode"
 CONF_HOUSE_ID = "house_id"
 
 # defaults
-DEFAULT_NAME = "Home"
+DEFAULT_NAME = ""
 DEFAULT_HOUSE = ""
 DEFAULT_POSTCODE = ""
 DEFAULT_HOUSE_ID = None
