@@ -39,7 +39,13 @@ ERROR_HOUSE_ID = "house_not_found"
 STATE_ATTR_COLOUR = "colour"
 STATE_ATTR_NEXT_COLLECTION = "next_collection"
 STATE_ATTR_DAYS = "days"
-
+STATE_ATTR_URL = "Info URL"
+# what to put in urls
+STATE_ATTR_URLS = {
+    "GREEN": "https://www.leeds.gov.uk/residents/bins-and-recycling/your-bins/green-recycling-bin",
+    "BROWN": "https://www.leeds.gov.uk/residents/bins-and-recycling/your-bins/brown-garden-waste-bin",
+    "BLACK": "https://www.leeds.gov.uk/residents/bins-and-recycling/your-bins/black-bin"
+}
 # bin types
 BIN_TYPES = {
     "GREEN": 'Recycling',

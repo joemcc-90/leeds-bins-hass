@@ -25,6 +25,8 @@ from .const import (
     STATE_ATTR_COLOUR,
     STATE_ATTR_DAYS,
     STATE_ATTR_NEXT_COLLECTION,
+    STATE_ATTR_URL,
+    STATE_ATTR_URLS,
     BIN_TYPES
 )
 from .leeds_bins_data_ import find_bin_days
@@ -134,16 +136,16 @@ class LeedsBinsDataSensor(CoordinatorEntity, SensorEntity):
             STATE_ATTR_COLOUR: self._colour,
             STATE_ATTR_NEXT_COLLECTION: self._next_collection,
             STATE_ATTR_DAYS: self._days,
+            STATE_ATTR_URL: STATE_ATTR_URLS[self._bin_type]
         }
 
     def apply_values(self):
         """Set sensor values."""
         bin_name = BIN_TYPES[self._bin_type]
         if self.config_name == '':
-            name = f"{bin_name} bin"
+            self._name = f"{bin_name} bin"
         else:
-            name = f"{self.config_name} - {bin_name} bin"
-        self._name = name
+            self._name = f"{self.config_name} - {bin_name} bin"
         if self.coordinator.data[self._bin_type] is not None:
             self._next_collection = parser.parse(
                 self.coordinator.data[self._bin_type], dayfirst=True
