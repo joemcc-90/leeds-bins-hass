@@ -7,6 +7,7 @@ Welcome to Leeds waste collection Home asistant integration! This is an integrat
 - [Welcome](#welcome)
 - [Installation](#installation)
 - [Configuration](#configuration)
+- [Automation Examples](#automation)
 - [Troubleshooting](#troubleshooting)
 
 ## Welcome
@@ -52,6 +53,10 @@ Configuration | Description
 `name` | Enter a friendly name for the configuration or leave blank (will affect sensor names (i.e. "Recycling bin" becomes "Friendly name - Recycling bin")) useful if monitoring multiple addresses
 `house` | Enter house name or number
 `postcode` | Enter postcode
+
+## Automation
+
+Testing
 
 ## Troubleshooting
 
