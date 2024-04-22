@@ -144,7 +144,7 @@ class LeedsBinsDataSensor(CoordinatorEntity, SensorEntity):
         elif self._bin_type == 'BROWN':
             bin_name = 'Garden Waste'
         if self.config_name is '':
-            name = f" {bin_name} bin"
+            name = f"{bin_name} bin"
         else:
             name = f"{self.config_name} - {bin_name} bin"
         self._name = name
