@@ -54,7 +54,7 @@ Configuration | Description
 `house` | Enter house name or number
 `postcode` | Enter postcode
 
-## Automation
+## Automation Examples
 
 Testing
 
