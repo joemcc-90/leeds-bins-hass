@@ -63,9 +63,8 @@ Example;
 alias: Bins - Green Bin
 description: ""
 trigger:
-  - platform: time_pattern
-    hours: "19"
-    minutes: "30"
+  - platform: time
+    at: "19:00:00"
 condition:
   - condition: state
     entity_id: sensor.leeds_bins_1234567_green_bin
