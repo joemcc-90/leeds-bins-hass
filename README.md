@@ -1,4 +1,4 @@
-# Leeds Bins Home assistant
+# Leeds Bins Home assistant integration
 
 Welcome to Leeds Bins Home asistant integration! This is an integration to get data from Leeds City Council in the UK and create sensors for each bin type.
 
