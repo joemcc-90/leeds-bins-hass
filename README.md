@@ -20,7 +20,7 @@ Platform | Name | Description
 `sensor` | Garden Waste bin | Show remaining days until garden waste bin collection day
 
 Each sensor has the following attributes;
-Attribute | Desctiption
+Attribute | Description
 -- | --
 Colour | Colour of the bin (i.e. GREEN, BLACK, BROWN)
 Next collection | Date of the next collection
