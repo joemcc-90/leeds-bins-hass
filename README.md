@@ -38,6 +38,7 @@ This integration can be installed directly via HACS. To install:
 
 This integration is configured through the Home Assistant UI. You need your house name or number and postcode.
 
+* Follow the steps in [Installation](#installation)
 * Log in to Home Assistant web interface
 * Go to - `Settings` > `Devices & Services` > `Integrations` > `ADD INTEGRATION`
 * Search for and select `Leeds Waste Collection`
