@@ -25,6 +25,7 @@ from .const import (
     STATE_ATTR_COLOUR,
     STATE_ATTR_DAYS,
     STATE_ATTR_NEXT_COLLECTION,
+    BIN_TYPES
 )
 from .leeds_bins_data_ import find_bin_days
 
@@ -137,12 +138,7 @@ class LeedsBinsDataSensor(CoordinatorEntity, SensorEntity):
 
     def apply_values(self):
         """Set sensor values."""
-        if self._bin_type == 'GREEN':
-            bin_name = 'Recycling'
-        elif self._bin_type == 'BLACK':
-            bin_name = 'General Waste'
-        elif self._bin_type == 'BROWN':
-            bin_name = 'Garden Waste'
+        bin_name = BIN_TYPES[self._bin_type]
         if self.config_name == '':
             name = f"{bin_name} bin"
         else:

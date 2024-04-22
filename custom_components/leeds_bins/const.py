@@ -40,6 +40,13 @@ STATE_ATTR_COLOUR = "colour"
 STATE_ATTR_NEXT_COLLECTION = "next_collection"
 STATE_ATTR_DAYS = "days"
 
+# bin types
+BIN_TYPES = {
+    "GREEN": 'Recycling',
+    "BLACK": 'General Waste',
+    "BROWN": 'Garden Waste'
+}
+
 # extend schema to load via YAML
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
     {
