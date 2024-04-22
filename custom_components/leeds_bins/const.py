@@ -43,7 +43,7 @@ STATE_ATTR_DAYS = "days"
 # extend schema to load via YAML
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
     {
-        vol.Required(CONF_NAME, default=DEFAULT_NAME): cv.string,
+        vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
         vol.Required(CONF_HOUSE, default=DEFAULT_HOUSE): cv.string,
         vol.Required(CONF_POSTCODE, default=DEFAULT_POSTCODE): cv.string,
         vol.Optional(CONF_HOUSE_ID, default=DEFAULT_HOUSE_ID): cv.string,
@@ -90,7 +90,7 @@ def create_form(user_input, hass):
     user_input = ensure_config(user_input, hass)
 
     data_schema = OrderedDict()
-    data_schema[vol.Required(CONF_NAME, default=user_input[CONF_NAME])] = str
+    data_schema[vol.Optional(CONF_NAME, default=user_input[CONF_NAME])] = str
     data_schema[vol.Required(CONF_HOUSE, default=user_input[CONF_HOUSE])] = str
     data_schema[vol.Required(CONF_POSTCODE, default=user_input[CONF_POSTCODE])] = str
     return data_schema
