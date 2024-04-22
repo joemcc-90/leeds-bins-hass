@@ -57,6 +57,26 @@ Configuration | Description
 ## Automation Examples
 
 Testing
+```
+alias: Bins - Green Bin
+description: ""
+trigger:
+  - platform: time_pattern
+    hours: "19"
+    minutes: "30"
+condition:
+  - condition: state
+    entity_id: sensor.leeds_bins_1234567_green_bin
+    attribute: days
+    state: "1"
+action:
+  - service: notify.mobile_app
+    data:
+      message: Recycling bin due out tomorrow
+      title: Bins - Green Bin
+mode: single
+```
+
 
 ## Troubleshooting
 
