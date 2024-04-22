@@ -56,7 +56,9 @@ Configuration | Description
 
 ## Automation Examples
 
-Testing
+To set up notifications, use a daily trigger with a condition which uses the days attribute. If days is 1 then bin is collected the following day.
+
+Example;
 ```
 alias: Bins - Green Bin
 description: ""
