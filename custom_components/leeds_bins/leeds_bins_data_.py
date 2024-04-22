@@ -21,7 +21,8 @@ def find_house_id(postcode, house):
             return None
         csv_data = response.content
         postcode = postcode.upper()
-        csv_reader = csv.reader(StringIO(csv_data.decode("utf-8")))
+        csv_io = StringIO(csv_data.decode("utf-8"))
+        csv_reader = csv.reader(csv_io)
         for row in csv_reader:
             if house.isdigit():
                 column = 2
@@ -30,7 +31,11 @@ def find_house_id(postcode, house):
                 house = house.upper()
 
             if row[column] == house and row[6] == postcode:
+                csv_reader.close()
+                csv_io.close()
                 return row[0]
+        csv_reader.close()
+        csv_io.close()
         return None  # noqa: TRY300
     except Exception as e:
         _LOGGER.error("Error occurred: %s", e)
@@ -78,7 +83,8 @@ def find_bin_days(house_id, updated_at, old_data):
     next_dates = {"BROWN": None, "BLACK": None, "GREEN": None}
     matching_rows = []
     count = 0
-    csv_reader = csv.reader(StringIO(csv_data.decode("utf-8")))
+    csv_io = StringIO(csv_data.decode("utf-8"))
+    csv_reader = csv.reader(csv_io)
     for row in csv_reader:
         if row[0] == house_id:
             matching_rows.append(row)
@@ -90,6 +96,8 @@ def find_bin_days(house_id, updated_at, old_data):
             next_dates[color] = nearest_date
     next_dates["updated_at"] = response.headers.get("Last-Modified")
     _LOGGER.info("Next Collection Dates: %s", next_dates)
+    csv_reader.close()
+    csv_io.close()
     return next_dates
 
 
