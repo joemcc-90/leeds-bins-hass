@@ -32,7 +32,7 @@ Dataset used provided by Data Mill North [Click here for more info](https://data
 
 This integration can be installed directly via HACS. To install:
 
-* [Add the repository](https://my.home-assistant.io/redirect/hacs_repository/?owner=joemcc-90&repository=leeds-bins-hassy&category=integration) to your HACS installation
+* [Add the repository](https://my.home-assistant.io/redirect/hacs_repository/?owner=joemcc-90&repository=leeds-bins-hass&category=integration) to your HACS installation
 * Click `Download`
 * Restart Home Assistant
 
