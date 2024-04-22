@@ -9,7 +9,7 @@ import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.core import callback
 
-from .const import CONF_ID, CONF_NAME, DOMAIN, check_data, create_form
+from .const import CONF_NAME, DOMAIN, check_data, create_form
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -32,30 +32,19 @@ class LeedsBinsFlowHandler(config_entries.ConfigFlow):
         self._errors = {}
         if user_input is not None:
             # there is user input, check and save if valid (see const.py)
-            self._errors = await check_data(user_input, self.hass)
+            data_check = await check_data(user_input, self.hass)
+            self._errors = data_check["errors"]
             if self._errors == {}:
-                self.data = user_input
+                self.data = data_check["user_input"]
+                user_input = data_check["user_input"]
                 return self.async_create_entry(
                     title=user_input[CONF_NAME], data=user_input
                 )
         # no user input, or error. Show form
         return self.async_show_form(
-            step_id="user",
             data_schema=vol.Schema(create_form(user_input, self.hass)),
             errors=self._errors,
         )
-
-    # TODO .. what is this good for?
-    async def async_step_import(self, user_input):  # pylint: disable=unused-argument
-        """Import a config entry.
-
-        Special type of import, we're not actually going to store any data.
-        Instead, we're going to rely on the values that are in config file.
-        """
-        if self._async_current_entries():
-            return self.async_abort(reason="single_instance_allowed")
-
-        return self.async_create_entry(title="configuration.yaml", data={})
 
     @staticmethod
     @callback
@@ -72,7 +61,6 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         # store old entry for later
         self.data = {}
         self.data.update(config_entry.data.items())
-        self.own_id = config_entry.data[CONF_ID]
 
     # will be called by sending the form, until configuration is done
     async def async_step_init(self, user_input=None):  # pylint: disable=unused-argument
@@ -80,16 +68,21 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         self._errors = {}
         if user_input is not None:
             # there is user input, check and save if valid (see const.py)
-            self._errors = await check_data(user_input, self.hass, self.own_id)
+            data_check = await check_data(user_input, self.hass)
+            self._errors = data_check["errors"]
+
             if self._errors == {}:
+                user_input = data_check["user_input"]
                 self.data.update(user_input)
-                self.async_create_entry(title=user_input[CONF_NAME], data=user_input)
+                user_input = data_check["user_input"]
+                return self.async_create_entry(
+                    title=user_input[CONF_NAME], data=user_input
+                )
         elif self.data is not None:
             # if we came straight from init
             user_input = self.data
         # no user input, or error. Show form
         return self.async_show_form(
-            step_id="init",
             data_schema=vol.Schema(create_form(user_input, self.hass)),
             errors=self._errors,
         )
