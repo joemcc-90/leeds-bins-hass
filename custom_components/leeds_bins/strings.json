@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "data": {
-          "name": "Name for this configuration",
+          "name": "Friendly name for this configuration",
           "house": "Enter house name or number",
           "postcode": "Enter postcode"
         },
@@ -22,7 +22,7 @@
     "step": {
       "init": {
         "data": {
-          "name": "Name for this configuration",
+          "name": "Friendly name for this configuration",
           "house": "Enter house name or number",
           "postcode": "Enter postcode"
         },

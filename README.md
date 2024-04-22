@@ -11,19 +11,44 @@ Welcome to Leeds Bins Home asistant integration! This is an integration to get d
 
 ## Welcome
 
-Nothing here yet
+Adds 3 sensors to Home Assistant that displays data about next waste collection dates using an address in the leeds city council area.
+
+Platform | Name | Description
+-- | -- | --
+`sensor` | Recycling bin | Show remaining days until recycling bin collection day
+`sensor` | General Waste bin | Show remaining days until general waste bin collection day
+`sensor` | Garden Waste bin | Show remaining days until garden waste bin collection day
+
+Each sensor has the following attributes;
+* Colour | Colour of the bin (i.e. GREEN, BLACK, BROWN)
+* Next collection | Date of the next collection
+* Days | Number of days until the next collection
+
+Dataset used provided by Data Mill North [Click here for more info](https://datamillnorth.org/dataset/ep6lz/household-waste-collections)
 
 ## Installation
 
-Nothing here yet
+This integration can be installed directly via HACS. To install:
 
-1. **Clone the repository:**
-
+* [Add the repository](https://my.home-assistant.io/redirect/hacs_repository/?owner=joemcc-90&repository=leeds-bins-hassy&category=integration) to your HACS installation
+* Click `Download`
+* Restart Home Assistant
 
 ## Configuration
 
-Nothing here yet
+This integration is configured through the Home Assistant UI. You need your house name or number and postcode.
+
+* Log in to Home Assistant web interface
+* Go to - `Settings` > `Devices & Services` > `Integrations` > `ADD INTEGRATION`
+* Search for and select `Leeds Waste Collection`
+* Enter configuration information;
+
+Configuration | Description
+-- | --
+`name` | Enter a friendly name for the configuration or leave blank (will affect sensor names (i.e. "Recycling bin" becomes "Name Recycling bin")) useful if monitoring multiple addresses
+`house` | Enter house name or number
+`postcode` | Enter postcode
 
 ## Troubleshooting
 
-Nothing here yet
+* If the sensor state is "No collection" then this means there is no scheduled collection, please check the dataset - [Dataset](https://datamillnorth.org/dataset/ep6lz/household-waste-collections)

@@ -11,7 +11,7 @@
             "user": {
                 "data": {
                     "house": "Enter house name or number",
-                    "name": "Name for this configuration",
+                    "name": "Friendly name for this configuration",
                     "postcode": "Enter postcode"
                 },
                 "description": "Creates Sensors for General Waste, Recycling and Garden Waste collection."
@@ -30,7 +30,7 @@
             "init": {
                 "data": {
                     "house": "Enter house name or number",
-                    "name": "Name for this configuration",
+                    "name": "Friendly name for this configuration",
                     "postcode": "Enter postcode"
                 },
                 "description": "Creates Sensors for General Waste, Recycling and Garden Waste collection."
