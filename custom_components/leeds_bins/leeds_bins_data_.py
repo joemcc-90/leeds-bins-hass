@@ -31,10 +31,8 @@ def find_house_id(postcode, house):
                 house = house.upper()
 
             if row[column] == house and row[6] == postcode:
-                csv_reader.close()
                 csv_io.close()
                 return row[0]
-        csv_reader.close()
         csv_io.close()
         return None  # noqa: TRY300
     except Exception as e:
@@ -96,7 +94,6 @@ def find_bin_days(house_id, updated_at, old_data):
             next_dates[color] = nearest_date
     next_dates["updated_at"] = response.headers.get("Last-Modified")
     _LOGGER.info("Next Collection Dates: %s", next_dates)
-    csv_reader.close()
     csv_io.close()
     return next_dates
 
