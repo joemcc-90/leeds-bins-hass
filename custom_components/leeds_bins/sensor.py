@@ -155,7 +155,7 @@ class LeedsBinsDataSensor(CoordinatorEntity, SensorEntity):
         else:
             self._next_collection = "No collection"
         self._hidden = False
-        self._icon = "mdi:trash-can"
+        self._icon = "mdi:trash-can-outline"
         self._colour = self._bin_type
         self._state = "waiting for data"
 
