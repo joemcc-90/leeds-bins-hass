@@ -7,7 +7,7 @@ Welcome to Leeds waste collection Home asistant integration! This is an integrat
 - [Welcome](#welcome)
 - [Installation](#installation)
 - [Configuration](#configuration)
-- [Automation Examples](#automation)
+- [Automation Examples](#automation-examples)
 - [Troubleshooting](#troubleshooting)
 
 ## Welcome
