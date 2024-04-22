@@ -27,7 +27,7 @@ Attribute | Description
 Colour | Colour of the bin (i.e. GREEN, BLACK, BROWN)
 Next collection | Date of the next collection
 Days | Number of days until the next collection
-Info URL | URL to Leeds City Council website with information on what can and can't go in the bin
+Info URL | URL to Leeds City Council website with information on what to put in your bin
 
 Dataset used provided by Data Mill North [Click here for more info](https://datamillnorth.org/dataset/ep6lz/household-waste-collections)
 
