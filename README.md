@@ -55,8 +55,6 @@ Configuration | Description
 `house` | Enter house name or number
 `postcode` | Enter postcode
 
-* Press save and the sensors will be created. The data will not be loaded immediately to speed up performance. Data will be loaded in the background after 10 minutes.
-
 
 ## Automation Examples
 

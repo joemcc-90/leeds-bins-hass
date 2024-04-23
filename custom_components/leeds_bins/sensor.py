@@ -60,6 +60,15 @@ async def async_setup_entry(
     coordinator = HouseholdBinCoordinator(
         hass, user_input[CONF_HOUSE_ID], user_input[CONF_NAME]
     )
+    cache_file = os.path.join(
+        hass.config.config_dir,
+        'custom_components',
+        DOMAIN,
+        'cache',
+        f'{user_input[CONF_HOUSE_ID]}.json')
+    if not os.path.exists(cache_file):
+        _LOGGER.info('Starting initial data download')
+        await coordinator.async_config_entry_first_refresh()
 
     async_add_entities([LeedsBinsDataSensor(coordinator, "GREEN")])
     async_add_entities([LeedsBinsDataSensor(coordinator, "BLACK")])
@@ -83,7 +92,7 @@ class HouseholdBinCoordinator(DataUpdateCoordinator):
             hass,
             _LOGGER,
             name="Leeds Bins",
-            update_interval=timedelta(minutes=10),
+            update_interval=timedelta(minutes=60),
         )
         _LOGGER.debug("Initiating data collection agent")
         folder = os.path.join(self.hass.config.config_dir, 'custom_components', DOMAIN, 'cache')
