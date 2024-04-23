@@ -152,7 +152,7 @@ class LeedsBinsDataSensor(CoordinatorEntity, SensorEntity):
             self._next_collection = "No collection"
         self._hidden = False
         self._icon = BIN_ICONS[self._bin_type]
-        self._colour = self._bin_type.lower()
+        self._colour = self._bin_type
         self._state = "waiting for data"
 
         _LOGGER.debug("Next collection: %s", self._next_collection)
