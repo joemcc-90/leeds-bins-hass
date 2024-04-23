@@ -104,6 +104,13 @@ mode: single
 * To hide a sensor go to - `Settings` > `Devices & Services` > `Integrations` > `Leeds Waste Collection` > `Entities` and open the sensor you wish to hide. Use the `Visible` option to hide the sensor
 * To enable debug logging go to - `Settings` > `Devices & Services` > `Integrations` > `Leeds Waste Collection` and select `Enable debug logging` 
 
+
+## Issues
+
+When you experience issues/bugs with this the best way to report them is to open an issue in this repo.
+
+[Issue link](https://github.com/joemcc-90/leeds-bins-hass/issues)
+
 ## Support
 
 [BuyMe~~Coffee~~Beer?](https://buymeacoffee.com/joemcc90)
