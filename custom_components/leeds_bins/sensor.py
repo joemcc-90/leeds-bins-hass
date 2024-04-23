@@ -85,7 +85,6 @@ class HouseholdBinCoordinator(DataUpdateCoordinator):
             update_interval=timedelta(minutes=1),
         )
         _LOGGER.debug("Initiating data collection agent")
-        self.filename = os.path.join(get_default_config_dir(), DOMAIN, 'data.txt')
         self.house_id = house_id
         self.hass = hass
         self.config_name = name
@@ -106,8 +105,6 @@ class HouseholdBinCoordinator(DataUpdateCoordinator):
         self.updated_at = data["updated_at"]
         if self.updated_at is not None:
             self.data = data
-        with open(self.filename, 'w') as file:
-            json.dump(data, file)
         _LOGGER.debug("Refreshed data: %s", data)
 
         return data
