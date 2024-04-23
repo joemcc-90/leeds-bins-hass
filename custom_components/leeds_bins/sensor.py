@@ -141,11 +141,7 @@ class LeedsBinsDataSensor(CoordinatorEntity, SensorEntity):
         super().__init__(coordinator)
         self._bin_type = bin_type
         self.apply_values()
-        self.entity_id = async_generate_entity_id(
-            ENTITY_ID_FORMAT,
-            "leeds_bins_" + str(self.house_id) + "_" + str(self._bin_type) + "_bin",
-            hass=self.coordinator.hass,
-        )
+        self.entity_id = f'sensor.leeds_bins_{str(self.house_id)}_{str(self._bin_type).lower()}_bin'
         self._id = self.entity_id
 
     @callback
