@@ -166,7 +166,7 @@ class LeedsBinsDataSensor(CoordinatorEntity, SensorEntity):
             if self._next_collection == "No collection":
                 self._state = "No collection"
             else:
-                self._days = (self._next_collection - now.date()).days
+                self._days = str((self._next_collection - now.date()).days)
                 if self._next_collection == now.date():
                     self._state = "Today"
                 elif self._next_collection == (now + timedelta(days=1)).date():
