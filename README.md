@@ -92,7 +92,7 @@ condition:
 action:
   - service: notify.mobile_app
     data:
-      message: Recycling bin due out tomorrow
+      message: Recycling bin due out today
       title: Bins - Green Bin
 mode: single
 ```
