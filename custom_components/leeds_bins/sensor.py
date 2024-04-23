@@ -27,7 +27,8 @@ from .const import (
     STATE_ATTR_NEXT_COLLECTION,
     STATE_ATTR_URL,
     STATE_ATTR_URLS,
-    BIN_TYPES
+    BIN_TYPES,
+    BIN_ICONS
 )
 from .leeds_bins_data_ import find_bin_days
 
@@ -142,10 +143,7 @@ class LeedsBinsDataSensor(CoordinatorEntity, SensorEntity):
     def apply_values(self):
         """Set sensor values."""
         bin_name = BIN_TYPES[self._bin_type]
-        if self.config_name == '':
-            self._name = f"{bin_name} bin"
-        else:
-            self._name = f"{self.config_name} - {bin_name} bin"
+        self._name = f"{self.config_name + ' - ' if self.config_name else ''}{bin_name} bin"
         if self.coordinator.data[self._bin_type] is not None:
             self._next_collection = parser.parse(
                 self.coordinator.data[self._bin_type], dayfirst=True
@@ -153,8 +151,8 @@ class LeedsBinsDataSensor(CoordinatorEntity, SensorEntity):
         else:
             self._next_collection = "No collection"
         self._hidden = False
-        self._icon = "mdi:trash-can-outline"
-        self._colour = self._bin_type
+        self._icon = BIN_ICONS[self._bin_type]
+        self._colour = self._bin_type.lower()
         self._state = "waiting for data"
 
         _LOGGER.debug("Next collection: %s", self._next_collection)

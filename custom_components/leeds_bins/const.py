@@ -52,6 +52,12 @@ BIN_TYPES = {
     "BLACK": 'General Waste',
     "BROWN": 'Garden Waste'
 }
+# icons
+BIN_ICONS = {
+    "GREEN": 'mdi:recycle',
+    "BLACK": 'mdi:trash-can',
+    "BROWN": 'mdi:leaf'
+}
 
 # extend schema to load via YAML
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
