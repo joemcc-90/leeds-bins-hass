@@ -107,9 +107,7 @@ mode: single
 
 ## Issues
 
-When you experience issues/bugs with this the best way to report them is to open an issue in this repo.
-
-[Issue link](https://github.com/joemcc-90/leeds-bins-hass/issues)
+When you experience issues/bugs with this the best way to report them is to open an issue in this repo. Click here - [Issue link](https://github.com/joemcc-90/leeds-bins-hass/issues)
 
 ## Support
 
