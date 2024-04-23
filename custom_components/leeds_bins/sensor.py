@@ -12,6 +12,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.config import get_default_config_dir
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity import async_generate_entity_id
+from homeassistant.helpers.storage import Store
 from homeassistant.helpers.entity_platform import AddEntitiesCallback  # noqa: E402
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
@@ -82,19 +83,27 @@ class HouseholdBinCoordinator(DataUpdateCoordinator):
             hass,
             _LOGGER,
             name="Leeds Bins",
-            update_interval=timedelta(minutes=1),
+            update_interval=timedelta(minutes=10),
         )
         _LOGGER.debug("Initiating data collection agent")
+        folder = os.path.join(self.hass.config.config_dir, 'custom_components', DOMAIN, 'cache')
+        if not os.path.exists(folder):
+            os.makedirs(folder)
         self.house_id = house_id
         self.hass = hass
         self.config_name = name
         self.updated_at = None
-        self.data = {
-            "BROWN": "01/01/01",
-            "BLACK": "01/01/01",
-            "GREEN": "01/01/01",
-            "updated_at": None,
-        }
+        self.cache_file = os.path.join(folder, f'{self.house_id}.json')
+        if not os.path.exists(self.cache_file):
+            self.data = {
+                "BROWN": "no_data",
+                "BLACK": "no_data",
+                "GREEN": "no_data",
+                "updated_at": None,
+            }
+        else:
+            with open(self.cache_file, 'r') as file:
+                self.data = json.load(file)
 
     async def _async_update_data(self):
         _LOGGER.debug("Updating data")
@@ -102,11 +111,14 @@ class HouseholdBinCoordinator(DataUpdateCoordinator):
         data = await self.hass.async_add_executor_job(
             get_latest_collection_info, self.house_id, self.updated_at, self.data
         )
+        if self.updated_at != data["updated_at"]:
+            _LOGGER.debug('Writing cache file')
+            with open(self.cache_file, 'w') as file:
+                json.dump(data, file)
         self.updated_at = data["updated_at"]
         if self.updated_at is not None:
             self.data = data
         _LOGGER.debug("Refreshed data: %s", data)
-
         return data
 
 
@@ -151,6 +163,9 @@ class LeedsBinsDataSensor(CoordinatorEntity, SensorEntity):
             self._next_collection = parser.parse(
                 self.coordinator.data[self._bin_type], dayfirst=True
             ).date()
+        elif self.coordinator.data[self._bin_type] == 'no_data':
+            self._next_collection = 'Waiting for data'
+            self._days = "Waiting for data"
         else:
             self._next_collection = "No collection"
         self._hidden = False
@@ -165,7 +180,7 @@ class LeedsBinsDataSensor(CoordinatorEntity, SensorEntity):
         this_week_end = this_week_start + timedelta(days=6)
         next_week_start = this_week_end + timedelta(days=1)
         next_week_end = next_week_start + timedelta(days=6)
-        if self.coordinator.data[self._bin_type] != "01/01/01":
+        if self.coordinator.data[self._bin_type] != "no_data":
             if self._next_collection == "No collection":
                 self._state = "No collection"
             else:
@@ -190,9 +205,6 @@ class LeedsBinsDataSensor(CoordinatorEntity, SensorEntity):
                     self._state = "Past"
                 else:
                     self._state = "Unknown"
-        else:
-            self._days = "Waiting for data"
-            self._next_collection = "Waiting for data"
 
         _LOGGER.debug("Sensor state - %s", self._state)
 
