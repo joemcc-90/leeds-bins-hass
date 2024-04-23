@@ -69,12 +69,30 @@ trigger:
 condition:
   - condition: state
     entity_id: sensor.leeds_bins_1234567_green_bin
-    attribute: days
-    state: "1"
+    state: Tomorrow
 action:
   - service: notify.mobile_app
     data:
       message: Recycling bin due out tomorrow
+      title: Bins - Green Bin
+mode: single
+```
+
+Example2;
+```
+alias: Bins - Green Bin
+description: ""
+trigger:
+  - platform: time
+    at: "07:00:00"
+condition:
+  - condition: state
+    entity_id: sensor.leeds_bins_1234567_green_bin
+    state: Today
+action:
+  - service: notify.mobile_app
+    data:
+      message: Recycling bin due out today
       title: Bins - Green Bin
 mode: single
 ```
