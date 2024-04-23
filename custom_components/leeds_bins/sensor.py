@@ -168,6 +168,7 @@ class LeedsBinsDataSensor(CoordinatorEntity, SensorEntity):
             ).date()
         else:
             self._next_collection = "No collection"
+            self._days = "No collection"
         self._hidden = False
         self._icon = BIN_ICONS[self._bin_type]
         self._colour = self._bin_type
