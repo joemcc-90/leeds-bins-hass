@@ -159,13 +159,13 @@ class LeedsBinsDataSensor(CoordinatorEntity, SensorEntity):
         """Set sensor values."""
         bin_name = BIN_TYPES[self._bin_type]
         self._name = f"{self.config_name + ' - ' if self.config_name else ''}{bin_name} bin"
-        if self.coordinator.data[self._bin_type] is not None:
+        if self.coordinator.data[self._bin_type] == 'no_data':
+            self._next_collection = 'Waiting for data'
+            self._days = "Waiting for data"
+        elif self.coordinator.data[self._bin_type] is not None:
             self._next_collection = parser.parse(
                 self.coordinator.data[self._bin_type], dayfirst=True
             ).date()
-        elif self.coordinator.data[self._bin_type] == 'no_data':
-            self._next_collection = 'Waiting for data'
-            self._days = "Waiting for data"
         else:
             self._next_collection = "No collection"
         self._hidden = False
