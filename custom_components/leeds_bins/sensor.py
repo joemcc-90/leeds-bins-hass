@@ -152,7 +152,7 @@ class LeedsBinsDataSensor(CoordinatorEntity, SensorEntity):
             self._next_collection = "No collection"
         self._hidden = False
         self._icon = BIN_ICONS[self._bin_type]
-        self._colour = self._bin_type.lower()
+        self._colour = self._bin_type
         self._state = "waiting for data"
 
         _LOGGER.debug("Next collection: %s", self._next_collection)
@@ -166,7 +166,7 @@ class LeedsBinsDataSensor(CoordinatorEntity, SensorEntity):
             if self._next_collection == "No collection":
                 self._state = "No collection"
             else:
-                self._days = (self._next_collection - now.date()).days
+                self._days = str((self._next_collection - now.date()).days)
                 if self._next_collection == now.date():
                     self._state = "Today"
                 elif self._next_collection == (now + timedelta(days=1)).date():
