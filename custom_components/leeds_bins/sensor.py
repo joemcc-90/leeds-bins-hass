@@ -4,9 +4,12 @@ from datetime import timedelta
 import logging
 
 from dateutil import parser
+import os
+import json
 
 from homeassistant.components.sensor import ENTITY_ID_FORMAT, SensorEntity
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.config import get_default_config_dir
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity import async_generate_entity_id
 from homeassistant.helpers.entity_platform import AddEntitiesCallback  # noqa: E402
@@ -17,6 +20,7 @@ from homeassistant.helpers.update_coordinator import (
 import homeassistant.util.dt as dt_util
 
 from .const import (
+    DOMAIN,
     CONF_HOUSE,
     CONF_HOUSE_ID,
     CONF_NAME,
@@ -81,6 +85,7 @@ class HouseholdBinCoordinator(DataUpdateCoordinator):
             update_interval=timedelta(minutes=1),
         )
         _LOGGER.debug("Initiating data collection agent")
+        self.filename = os.path.join(get_default_config_dir(), DOMAIN, 'data.txt')
         self.house_id = house_id
         self.hass = hass
         self.config_name = name
@@ -101,7 +106,8 @@ class HouseholdBinCoordinator(DataUpdateCoordinator):
         self.updated_at = data["updated_at"]
         if self.updated_at is not None:
             self.data = data
-
+        with open(self.filename, 'w') as file:
+            json.dump(data, file)
         _LOGGER.debug("Refreshed data: %s", data)
 
         return data
