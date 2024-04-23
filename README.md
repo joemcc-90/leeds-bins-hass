@@ -55,6 +55,9 @@ Configuration | Description
 `house` | Enter house name or number
 `postcode` | Enter postcode
 
+* Press save and the sensors will be created. The data will not be loaded immediately to speed up performance. Data will be loaded in the background after 10 minutes.
+
+
 ## Automation Examples
 
 To set up notifications, use a daily trigger with a condition which uses the days attribute. If days is 1 then bin is collected the following day.
@@ -103,6 +106,7 @@ mode: single
 * If the sensor state is "No collection" then this means there is no scheduled collection, please check the dataset - [Dataset](https://datamillnorth.org/dataset/ep6lz/household-waste-collections)
 * To hide a sensor go to - `Settings` > `Devices & Services` > `Integrations` > `Leeds Waste Collection` > `Entities` and open the sensor you wish to hide. Use the `Visible` option to hide the sensor
 * To enable debug logging go to - `Settings` > `Devices & Services` > `Integrations` > `Leeds Waste Collection` and select `Enable debug logging` 
+
 
 
 ## Issues
