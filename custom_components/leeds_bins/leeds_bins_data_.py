@@ -60,9 +60,11 @@ def find_bin_days(house_id, updated_at, old_data):
         _LOGGER.debug("Last-Modified header not found")
         return old_data
 
-    last_modified = datetime.strptime(last_modified_str, "%a, %d %b %Y %H:%M:%S %Z")
+    last_modified = datetime.strptime(
+        last_modified_str, "%a, %d %b %Y %H:%M:%S %Z")
     if updated_at is not None:
-        updated_at = datetime.strptime(updated_at, "%a, %d %b %Y %H:%M:%S %Z")
+        updated_at = datetime.strptime(
+            updated_at, "%a, %d %b %Y %H:%M:%S %Z")
         # Compare last modified date with updated_at
         if last_modified <= updated_at:
             _LOGGER.debug("CSV file not updated since last check")
