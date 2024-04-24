@@ -58,6 +58,13 @@ BIN_ICONS = {
     "BLACK": 'mdi:trash-can',
     "BROWN": 'mdi:leaf'
 }
+# default data
+DEFAULT_DATA = {
+    "BROWN": "no_data",
+    "BLACK": "no_data",
+    "GREEN": "no_data",
+    "updated_at": None,
+}
 
 # extend schema to load via YAML
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
@@ -68,18 +75,6 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
         vol.Optional(CONF_HOUSE_ID, default=DEFAULT_HOUSE_ID): cv.string,
     }
 )
-
-
-def get_next_id(hass):
-    """Provide the next unused id."""
-    if hass is None:
-        return 1
-    for i in range(1, 999):
-        if async_generate_entity_id(
-            ENTITY_ID_FORMAT, "ics_" + str(i), hass=hass
-        ) == PLATFORM + ".ics_" + str(i):
-            return i
-    return 999
 
 
 def ensure_config(user_input, hass):
