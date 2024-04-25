@@ -234,24 +234,31 @@ class LeedsBinsDataSensor(CoordinatorEntity, SensorEntity):
         this_week_end = this_week_start + timedelta(days=6)
         next_week_start = this_week_end + timedelta(days=1)
         next_week_end = next_week_start + timedelta(days=6)
+        week_after_next_start = next_week_end + timedelta(days=1)
+        week_after_next_end = week_after_next_start + timedelta(days=6)
         self._days = str((self._next_collection - now.date()).days)
         if self._next_collection == now.date():
             self._state = "Today"
         elif self._next_collection == (now + timedelta(days=1)).date():
             self._state = "Tomorrow"
+        elif self._next_collection < now.date():
+            self._state = "Collected - Waiting new data"
         elif (
             self._next_collection >= this_week_start
             and self._next_collection <= this_week_end
         ):
-            self._state = f"This Week: {self._next_collection.strftime('%A')}"
+            self._state = f"This week - {self._next_collection.strftime('%A')}"
         elif (
             self._next_collection >= next_week_start
             and self._next_collection <= next_week_end
         ):
-            self._state = f"Next Week: {self._next_collection.strftime('%A')}"
-        elif self._next_collection > next_week_end:
-            self._state = f"Future: {self._next_collection}"
-        elif self._next_collection < now.date():
-            self._state = "Collected - waiting new data"
+            self._state = f"Next week - {self._next_collection.strftime('%A')}"
+        elif (
+            self._next_collection >= week_after_next_start
+            and self._next_collection <= week_after_next_end
+        ):
+            self._state = f"Week after next - {self._next_collection.strftime('%A')}"
+        elif self._next_collection > week_after_next_end:
+            self._state = f"Future - {self._next_collection}"
         else:
             self._state = "Unknown"
