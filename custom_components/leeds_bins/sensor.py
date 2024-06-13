@@ -81,7 +81,7 @@ class HouseholdBinCoordinator(DataUpdateCoordinator):
             hass,
             _LOGGER,
             name="Leeds Bins",
-            update_interval=timedelta(minutes=60),
+            update_interval=timedelta(seconds=30),
         )
         _LOGGER.debug("Initiating data collection agent")
         folder = os.path.join(
@@ -96,11 +96,25 @@ class HouseholdBinCoordinator(DataUpdateCoordinator):
         self.config_name = name
         self.updated_at = None
         self.cache_file = os.path.join(folder, f'{self.house_id}.json')
+        _LOGGER.debug("Cache file path - %s", self.cache_file)
+
+        
+        self.hass.async_create_task(self._async_load_cache_file())
+
         if not os.path.exists(self.cache_file):
             self.data = DEFAULT_DATA
         else:
-            with open(self.cache_file, 'r') as file:
-                self.data = json.load(file)
+            self.hass.async_create_task(self._async_load_cache_file())
+    async def _async_load_cache_file(self):
+        """Asynchronously load the cache file."""
+        if os.path.exists(self.cache_file):
+            self.data = await self.hass.async_add_executor_job(self._load_cache_file)
+            _LOGGER.debug("Loaded data from cache file")
+
+    def _load_cache_file(self):
+        """Load the cache file in an executor."""
+        with open(self.cache_file, 'r') as file:
+            return json.load(file)
 
     async def _async_update_data(self):
         _LOGGER.debug("Updating data")
@@ -110,14 +124,25 @@ class HouseholdBinCoordinator(DataUpdateCoordinator):
         )
         if self.updated_at != data["updated_at"]:
             _LOGGER.debug('Writing cache file')
-            with open(self.cache_file, 'w') as file:
-                json.dump(data, file)
+            
+            await self.hass.async_add_executor_job(self._write_cache_file, data)
+
         self.updated_at = data["updated_at"]
         if self.updated_at is not None:
             self.data = data
+        if self.update_interval == timedelta(minutes=5):
+            self.update_interval = timedelta(minutes=60)
+            _LOGGER.debug("Changed update interval to 60 minutes")
+        if self.update_interval == timedelta(seconds=30):
+            self.update_interval = timedelta(minutes=5)
+            _LOGGER.debug("Changed update interval to 5 minutes")
         _LOGGER.debug("Refreshed data: %s", data)
         return data
 
+    def _write_cache_file(self, data):
+        """Write the cache file in an executor."""
+        with open(self.cache_file, 'w') as file:
+            json.dump(data, file)
 
 class LeedsBinsDataSensor(CoordinatorEntity, SensorEntity):
     """Implementation of the UK Bin Collection Data sensor."""
@@ -156,17 +181,23 @@ class LeedsBinsDataSensor(CoordinatorEntity, SensorEntity):
 
     def apply_values(self):
         """Set sensor values."""
+        self._hidden = False
+        self._icon = BIN_ICONS[self._bin_type]
+        self._colour = self._bin_type
         self._name = (
             f"{self.config_name + ' - ' if self.config_name else ''}"
             f"{BIN_TYPES[self._bin_type]} bin"
         )
+        if self.coordinator.data is None:
+            _LOGGER.debug("Coordinator data is not available yet")
+            self._next_collection = 'Integration starting up'
+            self._state = self._next_collection
+            self._days = self._next_collection
+            return
         if self.coordinator.data[self._bin_type] == 'no_data':
             self._next_collection = 'Waiting for data'
         elif self.coordinator.data[self._bin_type] is None:
             self._next_collection = "No collection"
-        self._hidden = False
-        self._icon = BIN_ICONS[self._bin_type]
-        self._colour = self._bin_type
         try:
             self._next_collection = parser.parse(
                 self.coordinator.data[self._bin_type], dayfirst=True

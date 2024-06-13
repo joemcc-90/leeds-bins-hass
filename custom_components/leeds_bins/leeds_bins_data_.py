@@ -105,11 +105,17 @@ def find_nearest_date(rows, color):
     matching_rows = [row for row in rows if row[1] == color]
     if not matching_rows:
         return None
+
     current_date = datetime.now()
     nearest_date = None
+
     for row in matching_rows:
         row_date = datetime.strptime(row[2], "%d/%m/%y")
+        if row_date < current_date:
+            continue
+
         time_difference = abs(current_date - row_date)
         if nearest_date is None or time_difference < nearest_date[1]:
             nearest_date = (row[2], time_difference)
-    return nearest_date[0]
+    
+    return nearest_date[0] if nearest_date else None
