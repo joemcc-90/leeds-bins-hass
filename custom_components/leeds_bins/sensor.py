@@ -358,6 +358,7 @@ class LeedsBinsDataSensor(CoordinatorEntity, SensorEntity):
             return
         next_bin = self.get_closest_date(self.coordinator.data)
         if next_bin is None:
+            _LOGGER.debug("Setting status - waiting for data")
             self._next_collection = 'Waiting for data'
             self._state = self._next_collection
             self._days = self._next_collection
