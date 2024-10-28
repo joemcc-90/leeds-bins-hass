@@ -336,7 +336,7 @@ class LeedsBinsDataSensor(CoordinatorEntity, SensorEntity):
             if difference >= 0 and (smallest_difference is None or difference < smallest_difference):
                 smallest_difference = difference
                 closest_key = key
-        _LOGGER.debug("Next bin day is - %s", closest_key)
+        _LOGGER.debug("Next bin is - %s", closest_key)
 
         return closest_key
     
