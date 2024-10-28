@@ -44,7 +44,8 @@ STATE_ATTR_URL = "Info URL"
 STATE_ATTR_URLS = {
     "GREEN": "https://www.leeds.gov.uk/residents/bins-and-recycling/your-bins/green-recycling-bin",
     "BROWN": "https://www.leeds.gov.uk/residents/bins-and-recycling/your-bins/brown-garden-waste-bin",
-    "BLACK": "https://www.leeds.gov.uk/residents/bins-and-recycling/your-bins/black-bin"
+    "BLACK": "https://www.leeds.gov.uk/residents/bins-and-recycling/your-bins/black-bin",
+    "NEXTBIN": ""
 }
 # bin types
 BIN_TYPES = {

@@ -4,6 +4,7 @@ from datetime import timedelta
 import logging
 
 from dateutil import parser
+from datetime import datetime
 import os
 import json
 
@@ -65,6 +66,7 @@ async def async_setup_entry(
     async_add_entities([LeedsBinsDataSensor(coordinator, "GREEN")])
     async_add_entities([LeedsBinsDataSensor(coordinator, "BLACK")])
     async_add_entities([LeedsBinsDataSensor(coordinator, "BROWN")])
+    async_add_entities([LeedsBinsDataSensor(coordinator, "NEXTBIN")])
 
 
 def get_latest_collection_info(house_id, updated_at, data) -> dict:
@@ -153,30 +155,47 @@ class LeedsBinsDataSensor(CoordinatorEntity, SensorEntity):
         self.config_name = coordinator.config_name
         super().__init__(coordinator)
         self._bin_type = bin_type
-        self.apply_values()
-        self.entity_id = (
-            'sensor.leeds_bins_' +
-            str(self.house_id) +
-            '_' +
-            str(self._bin_type).lower() +
-            '_bin'
-        )
-        self._id = self.entity_id
+        if self.bin_type == 'NEXTBIN':
+            self.apply_values_next_bin()
+            self.entity_id = (
+                'sensor.leeds_bins_' +
+                str(self.house_id) +
+                '_' +
+                str(self._bin_type).lower()
+            )
+            self._id = self.entity_id
+        else:
+            self.apply_values()
+            self.entity_id = (
+                'sensor.leeds_bins_' +
+                str(self.house_id) +
+                '_' +
+                str(self._bin_type).lower() +
+                '_bin'
+            )
+            self._id = self.entity_id
 
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle updated data from the coordinator."""
-        self.apply_values()
+        if self._bin_type == 'NEXTBIN':
+            self.apply_values_next_bin()
+        else:
+            self.apply_values()
         self.async_write_ha_state()
 
     @property
     def extra_state_attributes(self):
         """Return the state attributes."""
+        if self._bin_type == 'NEXTBIN':
+            bin_type = self.next_bin
+        else:
+            bin_type = self._bin_type
         return {
             STATE_ATTR_COLOUR: self._colour,
             STATE_ATTR_NEXT_COLLECTION: self._next_collection,
             STATE_ATTR_DAYS: self._days,
-            STATE_ATTR_URL: STATE_ATTR_URLS[self._bin_type]
+            STATE_ATTR_URL: STATE_ATTR_URLS[bin_type]
         }
 
     def apply_values(self):
@@ -293,3 +312,61 @@ class LeedsBinsDataSensor(CoordinatorEntity, SensorEntity):
             self._state = f"Future - {self._next_collection}"
         else:
             self._state = "Unknown"
+
+    def get_closest_date(self, data):
+        today = datetime.today()
+        closest_key = None
+        smallest_difference = None
+
+        for key, date_str in data.items():
+            # Skip 'updated_at' and any None values
+            if key == "updated_at" or date_str is None:
+                continue
+        
+            try:
+                date = datetime.strptime(date_str, "%d/%m/%Y")
+            except ValueError:
+                continue  # Skip if the date format is incorrect
+
+            # Calculate the difference between the current date and the parsed date
+            difference = (date - today).days
+
+            # Update the closest date if it's sooner and in the future
+            if difference >= 0 and (smallest_difference is None or difference < smallest_difference):
+                smallest_difference = difference
+                closest_key = key
+
+        return closest_key
+    
+    def apply_values_next_bin(self):
+
+        self._hidden = False
+        self._name = (
+            f"{self.config_name + ' - ' if self.config_name else ''}"
+            f"Next bin"
+        )
+        self._colour = 'Waiting for data'
+        self._icon = "mdi:cloud-download-outline"
+        if self.coordinator.data is None:
+            _LOGGER.debug("Coordinator data is not available yet")
+            self._next_collection = 'Integration starting up'
+            self._state = self._next_collection
+            self._days = self._next_collection
+            self.next_bin = self._bin_type
+            return
+        next_bin = self.get_closest_date(self.coordinator.data)
+        if next_bin is None:
+            self._next_collection = 'Waiting for data'
+            self._state = self._next_collection
+            self._days = self._next_collection
+            self.next_bin = self._bin_type
+            return
+        self._icon = BIN_ICONS[next_bin]
+        self._colour = next_bin
+        self._next_collection = parser.parse(
+                self.coordinator.data[next_bin], dayfirst=True
+            ).date()
+        self.calculate_state_and_days()
+        self._state = BIN_TYPES[next_bin]
+        self.next_bin = next_bin
+
