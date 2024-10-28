@@ -53,6 +53,9 @@ def find_bin_days(house_id, updated_at, old_data):
     if response.status_code != 200:
         _LOGGER.debug("Failed to fetch CSV from the web")
         return old_data
+    if int(response.headers.get("Content-Length", 0)) == 0:
+        _LOGGER.debug("CSV file is 0 bytes")
+        return old_data
 
     # Extract last modified date from headers
     last_modified_str = response.headers.get("Last-Modified")
