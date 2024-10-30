@@ -315,7 +315,7 @@ class LeedsBinsDataSensor(CoordinatorEntity, SensorEntity):
 
     def get_closest_date(self, data):
         _LOGGER.debug("Getting next bin day with data - %s", data)
-        today = datetime.today()
+        today = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
         closest_key = None
         smallest_difference = None
 
