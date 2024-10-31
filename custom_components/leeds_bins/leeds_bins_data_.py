@@ -114,7 +114,7 @@ def find_nearest_date(rows, color):
 
     for row in matching_rows:
         row_date = datetime.strptime(row[2], "%d/%m/%y")
-        if row_date < current_date:
+        if row_date < current_date.replace(hour=0, minute=0, second=0, microsecond=0):
             continue
 
         time_difference = abs(current_date - row_date)
