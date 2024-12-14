@@ -152,6 +152,7 @@ def get_next_dates_from_cache(cache_csv, old_data, house_id):
         nearest_date = find_nearest_date(matching_rows, color)
         if nearest_date:
             next_dates[color] = nearest_date
-    next_dates["updated_at"] = old_data["updated_at"]
+    next_dates["updated_at"] = datetime.strptime(
+            datetime.now(), "%a, %d %b %Y %H:%M:%S %Z")
     _LOGGER.info("Next Collection Dates from cache: %s", next_dates)
     return next_dates
