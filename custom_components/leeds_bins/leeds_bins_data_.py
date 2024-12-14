@@ -1,6 +1,6 @@
 """Leeds bins module."""
 
-import csv
+import csv, os
 from datetime import datetime
 from io import StringIO
 import logging
@@ -40,9 +40,10 @@ def find_house_id(postcode, house):
         return None
 
 
-def find_bin_days(house_id, updated_at, old_data):
+def find_bin_days(house_id, updated_at, old_data, cache_csv_file):
     """Find next bin days."""
     csv_url = "https://opendata.leeds.gov.uk/downloads/bins/dm_jobs.csv"
+    old_data = get_next_dates_from_cache(cache_csv_file, old_data, house_id)
     try:
         response = requests.head(
             csv_url, timeout=200
@@ -93,6 +94,18 @@ def find_bin_days(house_id, updated_at, old_data):
             matching_rows.append(row)
         else:
             count += 1
+    # Write matching rows to the cache CSV file
+    try:
+        if os.path.exists(cache_csv_file):
+            os.remove(cache_csv_file)
+            _LOGGER.info("Deleted existing cache file: %s", cache_csv_file)
+        with open(cache_csv_file, mode='w', newline='', encoding='utf-8') as file:
+            writer = csv.writer(file)
+            writer.writerows(matching_rows)
+            _LOGGER.info("Matching rows written to cache file: %s", cache_csv_file)
+    except Exception as e:
+        _LOGGER.error("Failed to write to cache file - %s", e)
+        return old_data
     for color in ["BROWN", "BLACK", "GREEN"]:
         nearest_date = find_nearest_date(matching_rows, color)
         if nearest_date:
@@ -122,3 +135,24 @@ def find_nearest_date(rows, color):
             nearest_date = (row[2], time_difference)
     
     return nearest_date[0] if nearest_date else None
+
+
+def get_next_dates_from_cache(cache_csv, old_data, house_id):
+    if not os.path.exists(cache_csv):
+        _LOGGER.debug("Cache file does not exist: %s", cache_csv)
+        return old_data
+    csv_reader = csv.reader(cache_csv)
+    next_dates = {"BROWN": None, "BLACK": None, "GREEN": None}
+    matching_rows = []
+    with open(cache_csv, mode='r', newline='', encoding='utf-8') as file:
+        csv_reader = csv.reader(file)
+        for row in csv_reader:
+            if row[0] == house_id:
+                matching_rows.append(row)
+    for color in ["BROWN", "BLACK", "GREEN"]:
+        nearest_date = find_nearest_date(matching_rows, color)
+        if nearest_date:
+            next_dates[color] = nearest_date
+    next_dates["updated_at"] = old_data["updated_at"]
+    _LOGGER.info("Next Collection Dates from cache: %s", next_dates)
+    return next_dates
