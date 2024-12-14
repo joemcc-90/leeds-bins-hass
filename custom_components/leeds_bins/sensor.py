@@ -69,9 +69,9 @@ async def async_setup_entry(
     async_add_entities([LeedsBinsDataSensor(coordinator, "NEXTBIN")])
 
 
-def get_latest_collection_info(house_id, updated_at, data) -> dict:
+def get_latest_collection_info(house_id, updated_at, data, cache_csv_file) -> dict:
     """Get the next bin collection dates."""
-    return find_bin_days(house_id, updated_at, data)
+    return find_bin_days(house_id, updated_at, data, cache_csv_file)
 
 
 class HouseholdBinCoordinator(DataUpdateCoordinator):
@@ -98,6 +98,7 @@ class HouseholdBinCoordinator(DataUpdateCoordinator):
         self.config_name = name
         self.updated_at = None
         self.cache_file = os.path.join(folder, f'{self.house_id}.json')
+        self.cache_csv_file = os.path.join(folder, f'{self.house_id}.csv')
         _LOGGER.debug("Cache file path - %s", self.cache_file)
 
         
@@ -122,7 +123,7 @@ class HouseholdBinCoordinator(DataUpdateCoordinator):
         _LOGGER.debug("Updating data")
 
         data = await self.hass.async_add_executor_job(
-            get_latest_collection_info, self.house_id, self.updated_at, self.data
+            get_latest_collection_info, self.house_id, self.updated_at, self.data, self.cache_csv_file
         )
         if self.updated_at != data["updated_at"]:
             _LOGGER.debug('Writing cache file')
@@ -132,6 +133,9 @@ class HouseholdBinCoordinator(DataUpdateCoordinator):
         self.updated_at = data["updated_at"]
         if self.updated_at is not None:
             self.data = data
+        if self.update_interval == timedelta(minutes=60):
+            self.update_interval = timedelta(minutes=720)
+            _LOGGER.debug("Changed update interval to 720 minutes")
         if self.update_interval == timedelta(minutes=5):
             self.update_interval = timedelta(minutes=60)
             _LOGGER.debug("Changed update interval to 60 minutes")
