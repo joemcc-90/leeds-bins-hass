@@ -1,7 +1,7 @@
 """Leeds bins module."""
 
 import csv, os
-from datetime import datetime
+from datetime import datetime, timezone
 from io import StringIO
 import logging
 
@@ -65,6 +65,8 @@ def find_bin_days(house_id, updated_at, old_data, cache_csv_file):
         updated_at = datetime.strptime(
             updated_at, "%a, %d %b %Y %H:%M:%S %Z")
         # Compare last modified date with updated_at
+        _LOGGER.debug("Last modified - %s", last_modified)
+        _LOGGER.debug("Updated at - %s", last_modified)
         if last_modified <= updated_at:
             _LOGGER.debug("CSV file not updated since last check")
             return old_data
@@ -152,6 +154,6 @@ def get_next_dates_from_cache(cache_csv, old_data, house_id):
         nearest_date = find_nearest_date(matching_rows, color)
         if nearest_date:
             next_dates[color] = nearest_date
-    next_dates["updated_at"] = datetime.now().strftime("%a, %d %b %Y %H:%M:%S")
+    next_dates["updated_at"] = datetime.now(timezone.utc).strftime("%a, %d %b %Y %H:%M:%S %Z")
     _LOGGER.info("Next Collection Dates from cache: %s", next_dates)
     return next_dates
