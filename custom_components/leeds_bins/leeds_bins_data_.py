@@ -43,26 +43,25 @@ def find_house_id(postcode, house):
 def find_bin_days(house_id, updated_at, old_data, cache_csv_file):
     """Find next bin days."""
     csv_url = "https://opendata.leeds.gov.uk/downloads/bins/dm_jobs.csv"
-    old_data = get_next_dates_from_cache(cache_csv_file, old_data, house_id)
     try:
         response = requests.head(
             csv_url, timeout=200
         )  # Use HEAD request to fetch only headers
     except Exception as e:
         _LOGGER.error("Failed to fetch data from web - %s", e)
-        return old_data
+        return get_next_dates_from_cache(cache_csv_file, old_data, house_id)
     if response.status_code != 200:
         _LOGGER.debug("Failed to fetch CSV from the web")
-        return old_data
+        return get_next_dates_from_cache(cache_csv_file, old_data, house_id)
     if int(response.headers.get("Content-Length", 0)) == 0:
         _LOGGER.debug("CSV file is 0 bytes")
-        return old_data
+        return get_next_dates_from_cache(cache_csv_file, old_data, house_id)
 
     # Extract last modified date from headers
     last_modified_str = response.headers.get("Last-Modified")
     if not last_modified_str:
         _LOGGER.debug("Last-Modified header not found")
-        return old_data
+        return get_next_dates_from_cache(cache_csv_file, old_data, house_id)
 
     last_modified = datetime.strptime(
         last_modified_str, "%a, %d %b %Y %H:%M:%S %Z")
@@ -79,10 +78,10 @@ def find_bin_days(house_id, updated_at, old_data, cache_csv_file):
         response = requests.get(csv_url, timeout=200)
     except Exception as e:
         _LOGGER.error("Failed to fetch data from web - %s", e)
-        return old_data
+        return get_next_dates_from_cache(cache_csv_file, old_data, house_id)
     if response.status_code != 200:
         _LOGGER.debug("Failed to fetch CSV from the web")
-        return old_data
+        return get_next_dates_from_cache(cache_csv_file, old_data, house_id)
     csv_data = response.content
     next_dates = {"BROWN": None, "BLACK": None, "GREEN": None}
     matching_rows = []
