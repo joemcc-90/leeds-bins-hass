@@ -53,16 +53,12 @@ def find_bin_days(house_id, updated_at, old_data, cache_csv_file):
     if response.status_code != 200:
         _LOGGER.debug("Failed to fetch CSV from the web")
         return get_next_dates_from_cache(cache_csv_file, old_data, house_id)
-    if int(response.headers.get("Content-Length", 0)) == 0:
-        _LOGGER.debug("CSV file is 0 bytes")
-        return get_next_dates_from_cache(cache_csv_file, old_data, house_id)
-
-    # Extract last modified date from headers
+    
     last_modified_str = response.headers.get("Last-Modified")
     if not last_modified_str:
         _LOGGER.debug("Last-Modified header not found")
         return get_next_dates_from_cache(cache_csv_file, old_data, house_id)
-
+    
     last_modified = datetime.strptime(
         last_modified_str, "%a, %d %b %Y %H:%M:%S %Z")
     if updated_at is not None:
@@ -72,6 +68,10 @@ def find_bin_days(house_id, updated_at, old_data, cache_csv_file):
         if last_modified <= updated_at:
             _LOGGER.debug("CSV file not updated since last check")
             return old_data
+    
+    if int(response.headers.get("Content-Length", 0)) == 0:
+        _LOGGER.debug("CSV file is 0 bytes")
+        return get_next_dates_from_cache(cache_csv_file, old_data, house_id)
 
     _LOGGER.info("Refreshing waste collection data - %s", house_id)
     try:
@@ -152,7 +152,6 @@ def get_next_dates_from_cache(cache_csv, old_data, house_id):
         nearest_date = find_nearest_date(matching_rows, color)
         if nearest_date:
             next_dates[color] = nearest_date
-    next_dates["updated_at"] = datetime.strptime(
-            datetime.now(), "%a, %d %b %Y %H:%M:%S %Z")
+    next_dates["updated_at"] = datetime.now().strftime("%a, %d %b %Y %H:%M:%S")
     _LOGGER.info("Next Collection Dates from cache: %s", next_dates)
     return next_dates
