@@ -66,7 +66,7 @@ def find_bin_days(house_id, updated_at, old_data, cache_csv_file):
             updated_at, "%a, %d %b %Y %H:%M:%S %Z")
         # Compare last modified date with updated_at
         _LOGGER.debug("Last modified - %s", last_modified)
-        _LOGGER.debug("Updated at - %s", last_modified)
+        _LOGGER.debug("Updated at - %s", updated_at)
         if last_modified <= updated_at:
             _LOGGER.debug("CSV file not updated since last check")
             return old_data
@@ -90,11 +90,43 @@ def find_bin_days(house_id, updated_at, old_data, cache_csv_file):
     count = 0
     csv_io = StringIO(csv_data.decode("utf-8"))
     csv_reader = csv.reader(csv_io)
-    for row in csv_reader:
-        if row[0] == house_id:
-            matching_rows.append(row)
-        else:
-            count += 1
+    try:
+        for row in csv_reader:
+            if not row:
+                continue
+            if row[0] == house_id:
+                matching_rows.append(row)
+            else:
+                count += 1
+    except csv.Error as err:
+        # Leeds occasionally publish this file truncated and NUL-padded out to its
+        # declared Content-Length. csv then reads the padding as one enormous field
+        # and raises "field larger than field limit".
+        #
+        # The rows read before the error are individually valid, but everything after
+        # the cut is missing - a collection whose row fell in the lost tail would
+        # silently disappear and the bin would be missed. So the partial download is
+        # discarded in favour of the cache, which is stale but complete.
+        #
+        # Returning rather than letting this propagate is the important part. The
+        # coordinator only records updated_at and widens its poll interval after a
+        # successful update, so an exception here left it re-downloading ~180MB every
+        # 30 seconds for as long as the upstream file stayed broken.
+        _LOGGER.warning(
+            "Truncated CSV from Leeds open data (%s) - discarding the partial "
+            "download and serving cached collection dates instead",
+            err,
+        )
+        csv_io.close()
+        return get_next_dates_from_cache(cache_csv_file, old_data, house_id)
+
+    if not matching_rows:
+        _LOGGER.error(
+            "No rows for house %s in the downloaded CSV - falling back to cache",
+            house_id,
+        )
+        csv_io.close()
+        return get_next_dates_from_cache(cache_csv_file, old_data, house_id)
     # Write matching rows to the cache CSV file
     try:
         if os.path.exists(cache_csv_file):
