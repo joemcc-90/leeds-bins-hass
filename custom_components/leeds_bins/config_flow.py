@@ -42,6 +42,7 @@ class LeedsBinsFlowHandler(config_entries.ConfigFlow):
                 )
         # no user input, or error. Show form
         return self.async_show_form(
+            step_id="user",
             data_schema=vol.Schema(create_form(user_input, self.hass)),
             errors=self._errors,
         )
@@ -83,6 +84,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             user_input = self.data
         # no user input, or error. Show form
         return self.async_show_form(
+            step_id="init",
             data_schema=vol.Schema(create_form(user_input, self.hass)),
             errors=self._errors,
         )
