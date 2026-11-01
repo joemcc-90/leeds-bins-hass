@@ -9,7 +9,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 
-from .const import DOMAIN, CONF_HOUSE_ID
+from .const import DOMAIN, CONF_HOUSE_ID, get_entry_config
 
 _LOGGER = logging.getLogger(__name__)
 PLATFORMS = [Platform.SENSOR]
@@ -18,8 +18,14 @@ PLATFORMS = [Platform.SENSOR]
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Leeds Bins from a config entry."""
     hass.data.setdefault(DOMAIN, {})
+    entry.async_on_unload(entry.add_update_listener(_async_reload_entry))
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
+
+
+async def _async_reload_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Reload so changes made in the options flow take effect."""
+    await hass.config_entries.async_reload(entry.entry_id)
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -29,7 +35,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         'custom_components',
         DOMAIN,
         'cache',
-        f'{entry.data[CONF_HOUSE_ID]}.json')
+        f'{get_entry_config(entry)[CONF_HOUSE_ID]}.json')
     if os.path.exists(cache_file):
         _LOGGER.info('Removing cache file')
         try:
