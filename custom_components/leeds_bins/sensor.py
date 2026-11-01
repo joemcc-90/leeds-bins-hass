@@ -25,9 +25,14 @@ from .const import (
     DOMAIN,
     CONF_HOUSE_ID,
     CONF_NAME,
+    CONF_POSTCODE_MODE,
+    CONF_PREMISES,
+    CONF_USE_POSTCODE,
+    get_entry_config,
     STATE_ATTR_COLOUR,
     STATE_ATTR_DAYS,
     STATE_ATTR_NEXT_COLLECTION,
+    STATE_ATTR_SOURCE,
     STATE_ATTR_URL,
     STATE_ATTR_URLS,
     BIN_TYPES,
@@ -46,19 +51,26 @@ async def async_setup_entry(
 ) -> None:
     """Set up the sensor platform."""
     _LOGGER.debug("Setting up leeds bins data collection platform")
-    _LOGGER.debug("Config supplied: %s", config.data)
+    settings = get_entry_config(config)
+    _LOGGER.debug("Config supplied: %s", settings)
 
-    _LOGGER.info("Using house id: %s", config.data.get(CONF_HOUSE_ID))
+    _LOGGER.info("Using house id: %s", settings.get(CONF_HOUSE_ID))
 
+    fallback = None
+    if settings.get(CONF_USE_POSTCODE) and settings.get(CONF_PREMISES):
+        fallback = {
+            "premises": settings[CONF_PREMISES],
+            "mode": settings.get(CONF_POSTCODE_MODE),
+        }
     coordinator = HouseholdBinCoordinator(
-        hass, config.data.get(CONF_HOUSE_ID), config.data.get(CONF_NAME)
+        hass, settings.get(CONF_HOUSE_ID), settings.get(CONF_NAME), fallback
     )
     cache_file = os.path.join(
         hass.config.config_dir,
         'custom_components',
         DOMAIN,
         'cache',
-        f'{config.data.get(CONF_HOUSE_ID)}.json')
+        f'{settings.get(CONF_HOUSE_ID)}.json')
     if not os.path.exists(cache_file):
         _LOGGER.info('Starting initial data download')
         await coordinator.async_config_entry_first_refresh()
@@ -69,15 +81,17 @@ async def async_setup_entry(
     async_add_entities([LeedsBinsDataSensor(coordinator, "NEXTBIN")])
 
 
-def get_latest_collection_info(house_id, updated_at, data, cache_csv_file) -> dict:
+def get_latest_collection_info(
+    house_id, updated_at, data, cache_csv_file, fallback=None
+) -> dict:
     """Get the next bin collection dates."""
-    return find_bin_days(house_id, updated_at, data, cache_csv_file)
+    return find_bin_days(house_id, updated_at, data, cache_csv_file, fallback)
 
 
 class HouseholdBinCoordinator(DataUpdateCoordinator):
     """Househould Waste Data collection agent."""
 
-    def __init__(self, hass, house_id, name):
+    def __init__(self, hass, house_id, name, fallback=None):
         """Initiate data collection agent."""
         super().__init__(
             hass,
@@ -94,6 +108,7 @@ class HouseholdBinCoordinator(DataUpdateCoordinator):
         if not os.path.exists(folder):
             os.makedirs(folder)
         self.house_id = house_id
+        self.fallback = fallback
         self.hass = hass
         self.config_name = name
         self.updated_at = None
@@ -123,7 +138,8 @@ class HouseholdBinCoordinator(DataUpdateCoordinator):
         _LOGGER.debug("Updating data")
 
         data = await self.hass.async_add_executor_job(
-            get_latest_collection_info, self.house_id, self.updated_at, self.data, self.cache_csv_file
+            get_latest_collection_info, self.house_id, self.updated_at, self.data, self.cache_csv_file,
+            self.fallback
         )
         if self.updated_at != data["updated_at"]:
             _LOGGER.debug('Writing cache file')
@@ -192,12 +208,17 @@ class LeedsBinsDataSensor(CoordinatorEntity, SensorEntity):
             bin_type = self.next_bin
         else:
             bin_type = self._bin_type
-        return {
+        attributes = {
             STATE_ATTR_COLOUR: self._colour,
             STATE_ATTR_NEXT_COLLECTION: self._next_collection,
             STATE_ATTR_DAYS: self._days,
             STATE_ATTR_URL: STATE_ATTR_URLS[bin_type]
         }
+        data = self.coordinator.data or {}
+        source = (data.get("fallback_sources") or {}).get(bin_type)
+        if source:
+            attributes[STATE_ATTR_SOURCE] = f"Postcode data - {source}"
+        return attributes
 
     def apply_values(self):
         """Set sensor values."""
@@ -321,8 +342,8 @@ class LeedsBinsDataSensor(CoordinatorEntity, SensorEntity):
         smallest_difference = None
 
         for key, date_str in data.items():
-            # Skip 'updated_at' and any None values
-            if key == "updated_at" or date_str is None:
+            # Only the bin colours hold dates; skip updated_at and missing dates
+            if key not in BIN_TYPES or date_str is None:
                 continue
         
             try:

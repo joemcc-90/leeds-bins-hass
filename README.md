@@ -54,6 +54,19 @@ Configuration | Description
 `name` | Enter a friendly name for the configuration or leave blank (will affect sensor names (i.e. "Recycling bin" becomes "Friendly name - Recycling bin")) useful if monitoring multiple addresses
 `house` | Enter house name or number
 `postcode` | Enter postcode
+`use_postcode_data` | Optional. If Leeds has no dates for one of your bins (e.g. no garden waste rows for your address), fill it in from other addresses in the same postcode. Your own address is always used first.
+`postcode_fallback` | Which neighbouring address to copy a missing date from (see below). Default is the nearest number on your side of the road.
+
+### Postcode fallback options
+
+Option | Behaviour
+-- | --
+Nearest number on my side of the road | Closest house number with the same odd/even parity - for streets where odds are on one side and evens on the other, or where all numbers are even/odd
+Nearest number, sequential street | Closest house number regardless of odd/even - for streets numbered 1, 2, 3... along one side
+Earliest date | The earliest upcoming date of any address in the postcode
+Most common date | The date most addresses in the postcode share
+
+Only addresses on your own street are compared by number; if none of them has data, the most common date across the postcode is used. Where two addresses are equally near, the most common date wins, then the earliest. A sensor using borrowed data shows a `Date source` attribute naming the address it came from.
 
 
 ## Automation Examples
