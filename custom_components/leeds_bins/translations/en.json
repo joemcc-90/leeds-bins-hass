@@ -1,40 +1,54 @@
 {
-    "config": {
-        "abort": {
-            "already_configured": "Device is already configured"
-        },
-        "error": {
-            "house_not_found": "Address was not found in LCC waste collection data",
-            "invalid_postcode": "Postcode entry was invalid"
-        },
-        "step": {
-            "user": {
-                "data": {
-                    "house": "Enter house name or number",
-                    "name": "Friendly name for this configuration",
-                    "postcode": "Enter postcode"
-                },
-                "description": "Creates Sensors for General Waste, Recycling and Garden Waste collection."
-            }
-        }
+  "config": {
+    "abort": {
+      "already_configured": "Device is already configured"
     },
-    "options": {
-        "abort": {
-            "already_configured": "Device is already configured"
+    "error": {
+      "house_not_found": "Address was not found in LCC waste collection data",
+      "invalid_postcode": "Postcode entry was invalid"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "house": "Enter house name or number",
+          "name": "Friendly name for this configuration",
+          "postcode": "Enter postcode",
+          "use_postcode_data": "Fill in missing bins using other addresses in the postcode",
+          "postcode_fallback": "Which neighbouring address to copy a missing date from"
         },
-        "error": {
-            "house_not_found": "Address was not found in LCC waste collection data",
-            "invalid_postcode": "Postcode entry was invalid"
-        },
-        "step": {
-            "init": {
-                "data": {
-                    "house": "Enter house name or number",
-                    "name": "Friendly name for this configuration",
-                    "postcode": "Enter postcode"
-                },
-                "description": "Creates Sensors for General Waste, Recycling and Garden Waste collection."
-            }
-        }
+        "description": "Creates Sensors for General Waste, Recycling and Garden Waste collection."
+      }
     }
+  },
+  "options": {
+    "abort": {
+      "already_configured": "Device is already configured"
+    },
+    "error": {
+      "house_not_found": "Address was not found in LCC waste collection data",
+      "invalid_postcode": "Postcode entry was invalid"
+    },
+    "step": {
+      "init": {
+        "data": {
+          "house": "Enter house name or number",
+          "name": "Friendly name for this configuration",
+          "postcode": "Enter postcode",
+          "use_postcode_data": "Fill in missing bins using other addresses in the postcode",
+          "postcode_fallback": "Which neighbouring address to copy a missing date from"
+        },
+        "description": "Creates Sensors for General Waste, Recycling and Garden Waste collection."
+      }
+    }
+  },
+  "selector": {
+    "postcode_fallback": {
+      "options": {
+        "nearest_same_side": "Nearest number on my side of the road (odds and evens on opposite sides, or all the same)",
+        "nearest_sequential": "Nearest number - my street is numbered sequentially (1 and 2 are neighbours)",
+        "earliest": "Earliest date of any address in the postcode",
+        "most_common": "Most common date across the postcode"
+      }
+    }
+  }
 }

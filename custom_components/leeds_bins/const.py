@@ -7,9 +7,19 @@ import voluptuous as vol
 
 from homeassistant.components.date import ENTITY_ID_FORMAT, PLATFORM_SCHEMA
 import homeassistant.helpers.config_validation as cv
+from homeassistant.helpers.selector import (
+    SelectSelector,
+    SelectSelectorConfig,
+    SelectSelectorMode,
+)
 from homeassistant.helpers.entity import async_generate_entity_id
 
-from .leeds_bins_data_ import find_house_id
+from .leeds_bins_data_ import (
+    DEFAULT_FALLBACK_MODE,
+    FALLBACK_MODES,
+    find_address,
+    find_house_id,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -24,12 +34,16 @@ CONF_NAME = "name"
 CONF_HOUSE = "house"
 CONF_POSTCODE = "postcode"
 CONF_HOUSE_ID = "house_id"
+CONF_USE_POSTCODE = "use_postcode_data"
+CONF_POSTCODE_MODE = "postcode_fallback"
+CONF_PREMISES = "postcode_premises"
 
 # defaults
 DEFAULT_NAME = ""
 DEFAULT_HOUSE = ""
 DEFAULT_POSTCODE = ""
 DEFAULT_HOUSE_ID = None
+DEFAULT_USE_POSTCODE = False
 
 # errors
 ERROR_POSTCODE = "invalid_postcode"
@@ -40,6 +54,7 @@ STATE_ATTR_COLOUR = "colour"
 STATE_ATTR_NEXT_COLLECTION = "next_collection"
 STATE_ATTR_DAYS = "days"
 STATE_ATTR_URL = "Info URL"
+STATE_ATTR_SOURCE = "Date source"
 # what to put in urls
 STATE_ATTR_URLS = {
     "GREEN": "https://www.leeds.gov.uk/residents/bins-and-recycling/your-bins/green-recycling-bin",
@@ -85,6 +100,9 @@ def ensure_config(user_input, hass):
     out[CONF_HOUSE] = ""
     out[CONF_POSTCODE] = ""
     out[CONF_HOUSE_ID] = None
+    out[CONF_USE_POSTCODE] = DEFAULT_USE_POSTCODE
+    out[CONF_POSTCODE_MODE] = DEFAULT_FALLBACK_MODE
+    out[CONF_PREMISES] = []
 
     if user_input is not None:
         if CONF_NAME in user_input:
@@ -97,7 +115,16 @@ def ensure_config(user_input, hass):
             out[CONF_HOUSE_ID] = user_input[CONF_HOUSE_ID]
         elif CONF_HOUSE_ID not in user_input:
             out[CONF_HOUSE_ID] = ""
+        if CONF_USE_POSTCODE in user_input:
+            out[CONF_USE_POSTCODE] = user_input[CONF_USE_POSTCODE]
+        if CONF_POSTCODE_MODE in user_input:
+            out[CONF_POSTCODE_MODE] = user_input[CONF_POSTCODE_MODE]
     return out
+
+
+def get_entry_config(entry):
+    """Setup data merged with any later changes made through the options flow."""
+    return {**entry.data, **entry.options}
 
 
 def create_form(user_input, hass):
@@ -108,6 +135,18 @@ def create_form(user_input, hass):
     data_schema[vol.Optional(CONF_NAME, default=user_input[CONF_NAME])] = str
     data_schema[vol.Required(CONF_HOUSE, default=user_input[CONF_HOUSE])] = str
     data_schema[vol.Required(CONF_POSTCODE, default=user_input[CONF_POSTCODE])] = str
+    data_schema[
+        vol.Optional(CONF_USE_POSTCODE, default=user_input[CONF_USE_POSTCODE])
+    ] = bool
+    data_schema[
+        vol.Optional(CONF_POSTCODE_MODE, default=user_input[CONF_POSTCODE_MODE])
+    ] = SelectSelector(
+        SelectSelectorConfig(
+            options=FALLBACK_MODES,
+            mode=SelectSelectorMode.DROPDOWN,
+            translation_key=CONF_POSTCODE_MODE,
+        )
+    )
     return data_schema
 
 
@@ -151,8 +190,15 @@ async def check_data(user_input, hass, own_id=None):
                 return_["errors"] = errors
                 return return_
     _LOGGER.debug(user_input[CONF_POSTCODE])
+    user_input[CONF_PREMISES] = []
     if user_input[CONF_HOUSE_ID] == "":
-        user_input[CONF_HOUSE_ID] = await load_house_id(hass, user_input)
+        if user_input[CONF_USE_POSTCODE]:
+            user_input[CONF_HOUSE_ID], premises = await hass.async_add_executor_job(
+                find_address, user_input[CONF_POSTCODE], user_input[CONF_HOUSE]
+            )
+            user_input[CONF_PREMISES] = premises or []
+        else:
+            user_input[CONF_HOUSE_ID] = await load_house_id(hass, user_input)
         if user_input[CONF_HOUSE_ID] is None:
             _LOGGER.error("%s House not found. User input - %s", LOG_PREFIX, user_input)
             errors["base"] = ERROR_HOUSE_ID
